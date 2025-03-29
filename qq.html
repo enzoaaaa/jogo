@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Vedação</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background: url('https://www.juntasdevedacao.com.br/blog/doutor/uploads/0/blog/2024/12/blog-juntas-de-veda-ccedil-atilde-o-para-flanges-tudo-que-voc-ecirc-precisa-saber-8fe4b7b516.png') no-repeat center center fixed;
+            background-size: cover;
+            color: #ffffff;
+        }
+        .quiz-container {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            border: 2px solid #ffcc00;
+            border-radius: 15px;
+            box-shadow: 4px 4px 20px rgba(255, 204, 0, 0.6);
+            background-color: rgba(46, 46, 62, 0.9);
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            width: 100%;
+            background-color: #ffcc00;
+            color: #1e1e2e;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #ffaa00;
+        }
+        .ranking {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <audio autoplay loop>
+        <source src="https://www.myinstants.com/media/sounds/musiquinha-para-o-site.mp3" type="audio/mpeg">
+    </audio>
+    <div class="quiz-container">
+        <h2 id="question">Pergunta aqui</h2>
+        <div id="answers"></div>
+        <h3 id="score">Pontuação: 0</h3>
+    </div>
+    <div class="ranking">
+        <h3>Ranking</h3>
+        <ul id="ranking-list"></ul>
+    </div>
+
+    <script>
+        const questions = [
+             { question: "O que é um O-ring?", answers: ["Um tipo de vedação", "Uma ferramenta de corte", "Um sensor de pressão"], correct: 0 },
+            { question: "Qual material é usado para vedações em altas temperaturas?", answers: ["Borracha", "Papelão hidráulico", "Plástico comum"], correct: 1 },
+            { question: "O que o Teflon ajuda a evitar?", answers: ["Desgaste e atrito", "Corrosão elétrica", "Acúmulo de poeira"], correct: 0 },
+            { question: "Qual é a principal função de uma vedação?", answers: ["Evitar vazamentos", "Reduzir o peso da máquina", "Aumentar a pressão interna"], correct: 0 },
+            { question: "Onde são mais comumente usados os O-rings?", answers: ["Motores e sistemas hidráulicos", "Circuitos elétricos", "Componentes de madeira"], correct: 0 },
+            { question: "O que pode causar falha em uma vedação?", answers: ["Temperatura excessiva", "Uso correto", "Apenas o tempo de uso"], correct: 0 },
+            { question: "O que caracteriza o papelão hidráulico?", answers: ["Alta resistência química", "Flexibilidade extrema", "Baixa durabilidade"], correct: 0 },
+            { question: "Quais são as principais vantagens do Teflon?", answers: ["Alta resistência térmica e química", "Facilidade de decomposição", "Alto custo e fragilidade"], correct: 0 },
+            { question: "Por que a vedação é importante na automação industrial?", answers: ["Para garantir a segurança e eficiência", "Para enfeitar as máquinas", "Para reduzir o custo de fabricação"], correct: 0 },
+            { question: "Como se chama a peça usada para vedação dinâmica em pistões?", answers: ["Anel de vedação", "Parafuso de pressão", "Mola espiral"], correct: 0 },
+            { question: "Qual é um fator crucial na escolha do material da vedação?", answers: ["Compatibilidade com fluídos", "Cor do material", "Preço mais barato"], correct: 0 },
+            { question: "O que pode danificar um O-ring?", answers: ["Excesso de pressão", "Lubrificação correta", "Baixa temperatura"], correct: 0 },
+            { question: "Qual propriedade do Teflon permite seu uso em vedações?", answers: ["Baixa fricção", "Alta absorção de líquidos", "Dureza extrema"], correct: 0 },
+            { question: "Como evitar vazamentos em um sistema vedado?", answers: ["Usando materiais adequados", "Apertando muito os parafusos", "Usando menos vedação"], correct: 0 },
+            { question: "O que acontece se uma vedação falhar?", answers: ["Pode ocorrer vazamento e falha do sistema", "O sistema se torna mais eficiente", "Nada acontece"], correct: 0 }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let ranking = JSON.parse(localStorage.getItem("ranking")) || [];
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function loadQuestion() {
+            if (currentQuestion >= questions.length) {
+                let playerName = prompt("Fim do quiz! Sua pontuação foi " + score + "\nDigite seu nome para entrar no ranking:");
+                if (playerName) {
+                    ranking.push({ name: playerName, score: score });
+                    ranking.sort((a, b) => b.score - a.score);
+                    localStorage.setItem("ranking", JSON.stringify(ranking));
+                    updateRanking();
+                }
+                return;
+            }
+            const q = questions[currentQuestion];
+            document.getElementById("question").textContent = q.question;
+            const answersDiv = document.getElementById("answers");
+            answersDiv.innerHTML = "";
+            
+            let shuffledAnswers = [...q.answers];
+            shuffle(shuffledAnswers);
+            
+            shuffledAnswers.forEach((answer) => {
+                const btn = document.createElement("button");
+                btn.textContent = answer;
+                btn.onclick = () => checkAnswer(answer, q.answers[q.correct]);
+                answersDiv.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedAnswer, correctAnswer) {
+            if (selectedAnswer === correctAnswer) {
+                alert("Correto!");
+                score += 2;
+            } else {
+                alert("Errado! A resposta certa é: " + correctAnswer);
+                score -= 1;
+            }
+            document.getElementById("score").textContent = "Pontuação: " + score;
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        function updateRanking() {
+            const rankingList = document.getElementById("ranking-list");
+            rankingList.innerHTML = "";
+            ranking.forEach((entry, index) => {
+                let li = document.createElement("li");
+                li.textContent = `${index + 1}. ${entry.name} - ${entry.score} pontos`;
+                rankingList.appendChild(li);
+            });
+        }
+
+        updateRanking();
+        loadQuestion();
+    </script>
+</body>
+</html>
